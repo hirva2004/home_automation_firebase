@@ -1,0 +1,112 @@
+#include <ESP8266WiFi.h>                                                // esp8266 library
+#include <FirebaseArduino.h>                                             // firebase library
+
+
+#define FIREBASE_HOST "homeautomation-86027-default-rtdb.firebaseio.com"  
+#define FIREBASE_AUTH "OHDdczHFaSzvQfgIlDTsdiSz3BR7cpKSpezvPaPb"                    // the secret key generated from firebase
+#define WIFI_SSID "Redmi M"                                          // input your home or public wifi name 
+#define WIFI_PASSWORD "12345678"                                    //password of wifi ssid
+
+#define Relay1 4 //D2
+int value1;
+ 
+#define Relay2 0 //D3
+int value2;
+ 
+#define Relay3 2  //D4
+int value3;
+ 
+#define Relay4 14 //D5
+int value4;
+ 
+void setup() 
+{
+  Serial.begin(115200);               
+  pinMode(Relay1,OUTPUT);
+  pinMode(Relay2,OUTPUT);
+  pinMode(Relay3,OUTPUT);
+  pinMode(Relay4,OUTPUT);
+ 
+  digitalWrite(Relay1,HIGH);
+  digitalWrite(Relay2,HIGH);
+  digitalWrite(Relay3,HIGH);
+  digitalWrite(Relay4,HIGH);
+ 
+ 
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);                                      //try to connect with wifi
+  Serial.print("Connecting to ");
+  Serial.print(WIFI_SSID);
+  while (WiFi.status() != WL_CONNECTED) {
+    Serial.print(".");
+    delay(500);
+  }
+  Serial.println();
+  Serial.print("Connected to ");
+  Serial.println(WIFI_SSID);
+  Serial.print("IP Address is : ");
+  Serial.println(WiFi.localIP());                                                      //print local IP address
+  Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);                                       // connect to firebase
+  Firebase.setString("LED_STATUS1", "0");                                          //send initial string of led status
+  Firebase.setString("LED_STATUS2", "0");
+  Firebase.setString("LED_STATUS3", "0");
+  Firebase.setString("LED_STATUS4", "0");
+}
+
+void loop()
+{
+  value1=Firebase.getString("LED_STATUS1").toInt();        //Reading the Status of Variable 1 from the firebase
+  
+  if(value1==1)                                             
+     {
+      digitalWrite(Relay1,LOW);
+      Serial.println("Relay 1 ON");
+    }
+    else if(value1==0)                                    
+    {                                      
+      digitalWrite(Relay1,HIGH);
+      Serial.println("Relay 1 OFF");
+    }
+ 
+  value2=Firebase.getString("LED_STATUS2").toInt();         //Reading the Status of Variable 2 from the firebase
+  
+  if(value2==1)                                                           
+     {
+      digitalWrite(Relay2,LOW);
+      Serial.println("Relay 2 ON");
+    }
+    else if(value2==0)                                                   
+    {                                      
+      digitalWrite(Relay2,HIGH);
+      Serial.println("Relay 2 OFF");
+    }
+ 
+   value3=Firebase.getString("LED_STATUS3").toInt();         //Reading the Status of Variable 3 from the firebase
+  
+  if(value3==1)                                                         
+     {
+      digitalWrite(Relay3,LOW);
+      Serial.println("Relay 3 ON");
+    }
+    else if(value3==0)                                                    
+    {                                      
+      digitalWrite(Relay3,HIGH);
+      Serial.println("Relay 3 OFF");
+    }
+ 
+   value4=Firebase.getString("LED_STATUS4").toInt();         //Reading the Status of Variable 4 from the firebase
+  
+  if(value4==1)                                                           
+     {
+      digitalWrite(Relay4,LOW);
+      Serial.println("Relay 4 ON");
+    }
+    else if(value4==0)                                                    
+    {                                      
+      digitalWrite(Relay4,HIGH);
+      Serial.println("Relay 4 OFF");
+    } 
+    else
+    {
+      Serial.println("Wrong Credential! Please send ON?OFF");  
+    }
+}
